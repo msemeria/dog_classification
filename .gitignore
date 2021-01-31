@@ -1,0 +1,8 @@
+# Dataset
+dogImages/
+
+# Environment
+env/
+
+# Compiled models
+*.pt
