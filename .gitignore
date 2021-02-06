@@ -2,7 +2,19 @@
 dogImages/
 
 # Environment
-env/
+dog_env/
 
 # Compiled models
 *.pt
+
+# exported files
+.ipynb_checkpoints/
+*.aux
+*.log
+*.out
+*.synctex.gz
+dog_app_files/
+
+# datasets
+dog_images/
+human_files/
