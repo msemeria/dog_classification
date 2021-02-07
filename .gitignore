@@ -1,13 +1,10 @@
-# Dataset
-dogImages/
-
 # Environment
 dog_env/
 
 # Compiled models
 *.pt
 
-# exported files
+# Exported files
 .ipynb_checkpoints/
 *.aux
 *.log
@@ -15,6 +12,12 @@ dog_env/
 *.synctex.gz
 dog_app_files/
 
-# datasets
+# Datasets
 dog_images/
 human_files/
+
+# Uploaded files
+dog_app/uploads
+
+# IDE
+.idea/
