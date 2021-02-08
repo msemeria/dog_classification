@@ -1,5 +1,10 @@
 import os
-from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template
+
+import torch
+from PIL import Image
+from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template, jsonify
+from torchvision import models
+from torchvision.transforms import transforms
 from werkzeug.utils import secure_filename
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -9,6 +14,13 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024
+
+model = models.vgg16(pretrained=True)
+# replace classifier
+# model.classifier[6] = torch.nn.Linear(4096, 133, bias=True)  # replace vgg16's last classifier
+
+# model.load_state_dict(torch.load(PATH))
+model.eval()  # Switch model to inference (evaluation) mode
 
 
 def allowed_file(filename):
@@ -24,9 +36,42 @@ def delete_uploads():
         Remove all uploaded files in upload folder
     """
     files = os.listdir(app.config['UPLOAD_FOLDER'])
-    print("delete files", files)
     for f in files:
         os.remove(os.path.join(UPLOAD_FOLDER, f))
+
+
+def transform_image(img_path):
+    # load the image and return the predicted breed
+    # Load image
+    img = Image.open(img_path)
+
+    # Define the pre-processing steps that will be applied to the image
+    transform = transforms.Compose([
+        transforms.Resize(256),  # Resize the image to 256x256 pixels
+        transforms.CenterCrop(224),  # Keep a 224x224 zone around the center
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406],  # Normalize using values advised in pytorch documentation
+                             std=[0.229, 0.224, 0.225]),
+    ])
+
+    # Pre-process the image
+    preprocessed_img = transform(img)
+
+    # if use_cuda:
+    #     preprocessed_img = preprocessed_img.to('cuda')
+
+    return torch.unsqueeze(preprocessed_img, 0)  # add a "batch" dimension to fit expected input format
+
+
+def get_prediction(img_path):
+    input_img = transform_image(img_path)
+
+    # Predict image's class
+    prediction = model(input_img)
+    prediction = prediction.cpu()
+    prediction = prediction.data.numpy().argmax()
+    # return class_names[prediction]
+    return prediction
 
 
 @app.route('/')
@@ -56,7 +101,10 @@ def upload_file():
         return redirect(request.url)
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        prediction = get_prediction(filepath)
+        print('predict', prediction)
         return redirect(url_for('index'))
 
 
