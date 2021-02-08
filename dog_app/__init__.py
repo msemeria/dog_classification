@@ -1,3 +1,4 @@
+import glob
 import os
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template
 from werkzeug.utils import secure_filename
@@ -12,19 +13,39 @@ app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024
 
 
 def allowed_file(filename):
+    """
+        Validate file extension
+    """
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+def delete_uploads():
+    """
+        Remove all uploaded files in upload folder
+    """
+    files = os.listdir(app.config['UPLOAD_FOLDER'])
+    print("delete files", files)
+    for f in files:
+        os.remove(os.path.join(UPLOAD_FOLDER, f))
+
+
 @app.route('/')
 def index():
+    """
+        Display main page
+    """
     files = os.listdir(app.config['UPLOAD_FOLDER'])
     return render_template('index.html', files=files)
 
 
 @app.route('/', methods=['POST'])
 def upload_file():
+    """
+        Upload a file to upload folder
+    """
     if request.method == 'POST':
+        delete_uploads()
         # check if the post request has the file part
         if 'file' not in request.files:
             flash('No file part')
@@ -43,6 +64,9 @@ def upload_file():
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
+    """
+        Display uploaded file
+    """
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
