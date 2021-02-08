@@ -1,3 +1,4 @@
+import json
 import os
 
 import torch
@@ -15,11 +16,14 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024
 
+imagenet_class_index = json.load(open(os.path.join(basedir, '_static/imagenet_class_index.json')))
+
 model = models.vgg16(pretrained=True)
 # replace classifier
 # model.classifier[6] = torch.nn.Linear(4096, 133, bias=True)  # replace vgg16's last classifier
 
 # model.load_state_dict(torch.load(PATH))
+# model.to('cpu')
 model.eval()  # Switch model to inference (evaluation) mode
 
 
@@ -77,8 +81,8 @@ def get_prediction(filename):
     prediction = model(input_img)
     prediction = prediction.cpu()
     prediction = prediction.data.numpy().argmax()
-    # return class_names[prediction]
-    return prediction
+    class_id, class_name = imagenet_class_index[str(prediction)]
+    return class_name.replace("_", " ")
 
 
 @app.route('/')
@@ -110,7 +114,7 @@ def predict():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         prediction = get_prediction(filepath)
-        return render_template('predict.html', file=filename, prediction=prediction )
+        return render_template('predict.html', file=filename, prediction=prediction)
 
 
 @app.route('/uploads/<filename>')
