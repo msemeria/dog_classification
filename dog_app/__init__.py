@@ -41,6 +41,9 @@ def delete_uploads():
 
 
 def transform_image(img_path):
+    """
+        Preprocess image to fit model's input format
+    """
     # load the image and return the predicted breed
     # Load image
     img = Image.open(img_path)
@@ -64,6 +67,9 @@ def transform_image(img_path):
 
 
 def get_prediction(filename):
+    """
+        Return model inference on input image
+    """
     img_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     input_img = transform_image(img_path)
 
@@ -84,7 +90,7 @@ def index():
 
 
 @app.route('/', methods=['POST'])
-def upload_file():
+def predict():
     """
         Upload a file to upload folder
     """
@@ -103,9 +109,8 @@ def upload_file():
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
-        # prediction = get_prediction(filepath)
-        # print('predict', prediction)
-        return render_template('upload.html', file=filename)
+        prediction = get_prediction(filepath)
+        return render_template('predict.html', file=filename, prediction=prediction )
 
 
 @app.route('/uploads/<filename>')

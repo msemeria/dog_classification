@@ -7,3 +7,8 @@
     <hr>
     <img src="{{ url_for('uploaded_file', filename=file) }}" style="width: 1000px">
 {% endblock %}
+
+{% block prediction %}
+<h1>Result</h1>
+<p> Predicted dog breed is ... {{ prediction }} </p>
+{% endblock %}
