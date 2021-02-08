@@ -63,7 +63,8 @@ def transform_image(img_path):
     return torch.unsqueeze(preprocessed_img, 0)  # add a "batch" dimension to fit expected input format
 
 
-def get_prediction(img_path):
+def get_prediction(filename):
+    img_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     input_img = transform_image(img_path)
 
     # Predict image's class
@@ -79,8 +80,7 @@ def index():
     """
         Display main page
     """
-    files = os.listdir(app.config['UPLOAD_FOLDER'])
-    return render_template('index.html', files=files)
+    return render_template('index.html')
 
 
 @app.route('/', methods=['POST'])
@@ -103,9 +103,9 @@ def upload_file():
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
-        prediction = get_prediction(filepath)
-        print('predict', prediction)
-        return redirect(url_for('index'))
+        # prediction = get_prediction(filepath)
+        # print('predict', prediction)
+        return render_template('upload.html', file=filename)
 
 
 @app.route('/uploads/<filename>')

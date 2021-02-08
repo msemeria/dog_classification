@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% extends 'index.html' %}
+
+{% block image %}
+    <hr>
+    <img src="{{ url_for('uploaded_file', filename=file) }}" style="width: 1000px">
+{% endblock %}

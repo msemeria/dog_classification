@@ -9,9 +9,6 @@
       <p><input type="file" name="file"></p>
       <p><input type="submit" value="Submit"></p>
     </form>
-    <hr>
-    {% for file in files %}
-      <img src="{{ url_for('uploaded_file', filename=file) }}" style="width: 1000px">
-    {% endfor %}
+  {% block image %}{% endblock %}
   </body>
 </html>
