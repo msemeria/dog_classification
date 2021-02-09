@@ -19,11 +19,13 @@ app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024
 imagenet_class_index = json.load(open(os.path.join(basedir, '_static/imagenet_class_index.json')))
 
 model = models.vgg16(pretrained=True)
-# replace classifier
-# model.classifier[6] = torch.nn.Linear(4096, 133, bias=True)  # replace vgg16's last classifier
-
-# model.load_state_dict(torch.load(PATH))
-# model.to('cpu')
+custom_model = os.path.join(basedir, '../model_transfer.pt')
+if os.path.exists(custom_model):
+    # replace classifier
+    model.classifier[6] = torch.nn.Linear(4096, 133, bias=True)  # replace vgg16's last classifier
+    model.load_state_dict(torch.load(custom_model,  map_location=torch.device('cpu')))
+else:
+    print("No custom model found, defaulting to vgg16")
 model.eval()  # Switch model to inference (evaluation) mode
 
 
@@ -54,7 +56,7 @@ def transform_image(img_path):
 
     # Define the pre-processing steps that will be applied to the image
     transform = transforms.Compose([
-        transforms.Resize(256),  # Resize the image to 256x256 pixels
+        transforms.Resize(400),  # Resize the image to 256x256 pixels
         transforms.CenterCrop(224),  # Keep a 224x224 zone around the center
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406],  # Normalize using values advised in pytorch documentation
@@ -82,6 +84,7 @@ def get_prediction(filename):
     prediction = prediction.cpu()
     prediction = prediction.data.numpy().argmax()
     class_id, class_name = imagenet_class_index[str(prediction)]
+    print(prediction, class_name)
     return class_name.replace("_", " ")
 
 
