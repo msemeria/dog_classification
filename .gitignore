@@ -7,6 +7,7 @@ model/*.pt
 
 # Exported files
 model/.ipynb_checkpoints/
+model/*.tex
 model/*.aux
 model/*.log
 model/*.out
