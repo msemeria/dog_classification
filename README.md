@@ -17,4 +17,4 @@ export FLASK_APP=dog_app
 export FLASK_ENV=development
 flask run
 ```
-The web app looks for a saved model file model/model_webapp.pt. This file can be obtained by executing model/dog_app.ipynb. If the file acnnot be found, the webapp defaults to using a Vgg16 pretrained model.
+The web app looks for a saved model file model/model_webapp.pt. This file can be obtained by executing model/dog_app.ipynb. If the file cannot be found, the webapp defaults to using a Vgg16 pretrained model.
