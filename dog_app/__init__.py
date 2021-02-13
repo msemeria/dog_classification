@@ -24,6 +24,8 @@ if os.path.exists(custom_model):
     # replace classifier
     model.classifier[6] = torch.nn.Linear(4096, 133, bias=True)  # replace vgg16's last classifier
     model.load_state_dict(torch.load(custom_model,  map_location=torch.device('cpu')))
+    # for param in model.features.parameters():
+    #     param.requires_grad = False
 else:
     print("No custom model found, defaulting to vgg16")
 model.eval()  # Switch model to inference (evaluation) mode
