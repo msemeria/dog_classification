@@ -19,7 +19,7 @@ app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024
 
 imagenet_class_index = json.load(open(os.path.join(basedir, '_static/imagenet_class_index.json')))
 # extract pre-trained face detector
-face_cascade = cv2.CascadeClassifier('haarcascades/haarcascade_frontalface_alt.xml')
+face_cascade = cv2.CascadeClassifier(os.path.join(basedir, '../model/haarcascades/haarcascade_frontalface_alt.xml'))
 
 model = models.vgg16(pretrained=True)
 custom_model = os.path.join(basedir, '../model/model_transfer.pt')
@@ -90,7 +90,7 @@ def get_prediction(filename):
     prediction = prediction.data.numpy().argmax()
     class_id, class_name = imagenet_class_index[str(prediction)]
     print(prediction, class_name)
-    return class_name.replace("_", " ")
+    return prediction, class_name.replace("_", " ")
 
 
 def face_detector(img_path):
@@ -131,8 +131,16 @@ def predict():
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
-        prediction = get_prediction(filepath)
-        return render_template('predict.html', file=filename, prediction=prediction)
+        class_index, class_name = get_prediction(filepath)
+        is_human = face_detector(filepath)
+        # a human is detected
+        if is_human:
+            return render_template('predict_human.html', file=filename, prediction=class_name)
+        # a dog is detected
+        elif 151 <= class_index <= 268:
+            return render_template('predict_dog.html', file=filename, prediction=class_name)
+        else:
+            return render_template('no_prediction.html', file=filename)
 
 
 @app.route('/uploads/<filename>')

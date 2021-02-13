@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 
-{% extends 'index.html' %}
+{% extends 'predict.html' %}
 
 {% block image %}
     <hr>
     <img src="{{ url_for('uploaded_file', filename=file) }}" style="width: 256px">
+{% endblock %}
+
+{% block prediction %}
+<h1>Result</h1>
+<p> Hello dog! I think you are a ... {{ prediction }} </p>
 {% endblock %}
