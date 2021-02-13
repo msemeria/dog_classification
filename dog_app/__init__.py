@@ -19,11 +19,15 @@ app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024
 
 imagenet_class_index = json.load(open(os.path.join(basedir, '_static/imagenet_class_index.json')))
 
-custom_model = os.path.join(basedir, '../model/model_webapp.pt')
+model = models.vgg16(pretrained=True)
+custom_model = os.path.join(basedir, '../model/model_transfer.pt')
 if os.path.exists(custom_model):
-    model = torch.load(custom_model, map_location=torch.device('cpu'))
+    # replace classifier
+    model.classifier[6] = torch.nn.Linear(4096, 133, bias=True)  # replace vgg16's last classifier
+    model.load_state_dict(torch.load(custom_model,  map_location=torch.device('cpu')))
+    for param in model.features.parameters():
+        param.requires_grad = False
 else:
-    model = models.vgg16(pretrained=True)
     print("No custom model found, defaulting to vgg16")
 model.eval()  # Switch model to inference (evaluation) mode
 
