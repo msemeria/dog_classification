@@ -2,8 +2,9 @@ import json
 import os
 
 import torch
+
 from PIL import Image
-from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template, jsonify
+from flask import Flask, flash, request, redirect, send_from_directory, render_template
 from torchvision import models
 from torchvision.transforms import transforms
 from werkzeug.utils import secure_filename
@@ -35,11 +36,11 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def delete_uploads():
+def delete_uploads(upload_folder):
     """
         Remove all uploaded files in upload folder
     """
-    files = os.listdir(app.config['UPLOAD_FOLDER'])
+    files = os.listdir(upload_folder)
     for f in files:
         os.remove(os.path.join(UPLOAD_FOLDER, f))
 
@@ -99,7 +100,7 @@ def predict():
     """
         Upload a file to upload folder
     """
-    delete_uploads()
+    delete_uploads(app.config['UPLOAD_FOLDER'])
     # check if the post request has the file part
     if 'file' not in request.files:
         flash('No file part')
