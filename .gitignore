@@ -1,6 +1,5 @@
 # Environment
 venv/
-dog_env/
 
 # Compiled models
 model/*.pt
