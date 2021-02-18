@@ -4,7 +4,7 @@
 [image2]: ./images/vgg16_model.png "VGG-16 Model Layers"
 [image3]: ./images/vgg16_model_draw.png "VGG16 Model Figure"
 
-This is a fork of Udacity's deep learning dog classification project. Original repository can be found at: https://github.com/udacity/deep-learning-v2-pytorch.git
+This is a fork of Udacity's deep learning dog classification project. Original repository can be found at: https://github.com/udacity/deep-learning-v2-pytorch/tree/master/project-dog-classification
 
 ## Project Overview
 
